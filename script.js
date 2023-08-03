@@ -304,18 +304,14 @@ class App {
     const workout = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
-    console.log(workout);
 
-    // Get Coordinate from an element and move to coordinate
+    // Get Coordinate from element and move to coordinate
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
         duration: 1,
       },
     });
-
-    // Using the public interface
-    workout.click();
   }
 
   _setLocalStorage() {
@@ -325,16 +321,21 @@ class App {
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
-    // Guard Clause
+    // Guard Clausa
     if (!data) return;
 
     // Restore data from storage
     this.#workouts = data;
 
-    // Rendering data from local storage
+    // Rendering data from localstorage
     this.#workouts.forEach(work => {
       this._randerWorkout(work);
     });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
   }
 }
 const app = new App();
