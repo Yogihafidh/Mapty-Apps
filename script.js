@@ -86,17 +86,16 @@ class App {
   #workouts = [];
 
   constructor() {
-    // Get Position User
+    // Get User Position
     this._getPosition();
 
-    // Input Form
-    form.addEventListener('submit', this._newWorkout.bind(this));
+    // Get data from local storage
+    this._getLocalStorage();
 
-    // Type Workout
-    inputType.addEventListener('change', this._toggleElevationField);
-
-    // Event Delegation
-    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
+    // Attach Event handler
+    form.addEventListener('submit', this._newWorkout.bind(this)); // Input Form
+    inputType.addEventListener('change', this._toggleElevationField); // Type Workout
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this)); // Event Delegation
   }
 
   _getPosition() {
@@ -129,6 +128,11 @@ class App {
 
     // 3. Event handler in leaflet library
     this.#map.on('click', this._showForm.bind(this));
+
+    // 4. Render all marker
+    this.#workouts.forEach(work => {
+      this._randerWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -204,7 +208,6 @@ class App {
 
     // Add new objek to workout array
     this.#workouts.push(workout);
-    console.log(workout);
 
     // Render workout on map as a marker
     this._randerWorkoutMarker(workout);
@@ -214,6 +217,9 @@ class App {
 
     // Hide form and Clear input fields
     this._hideform();
+
+    // Set Local storage to all workouts
+    this._setLocalStorage();
   }
 
   _randerWorkoutMarker(workout) {
@@ -300,7 +306,7 @@ class App {
     );
     console.log(workout);
 
-    // Get Coordinate from element and move to coordinate
+    // Get Coordinate from an element and move to coordinate
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
@@ -310,6 +316,25 @@ class App {
 
     // Using the public interface
     workout.click();
+  }
+
+  _setLocalStorage() {
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  _getLocalStorage() {
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    // Guard Clause
+    if (!data) return;
+
+    // Restore data from storage
+    this.#workouts = data;
+
+    // Rendering data from local storage
+    this.#workouts.forEach(work => {
+      this._randerWorkout(work);
+    });
   }
 }
 const app = new App();
